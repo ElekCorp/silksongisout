@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.silksongisout.ui.theme.SilksongisoutTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -198,7 +199,11 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
     }
 
     LaunchedEffect(Unit) { // Unit means this runs once when the composable enters the composition
-        loadStatus()
+        while (true) {
+            Log.d("SilksongStatusScreen", "Periodic update: Loading status...")
+            loadStatus() // Call the suspend function
+            delay(60000L) // Delay for 60000 milliseconds (1 minute)
+        }
     }
 
     // Effect to react to status changes for sound playback
