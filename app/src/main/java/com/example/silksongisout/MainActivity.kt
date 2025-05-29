@@ -197,8 +197,13 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    LaunchedEffect(Unit) { // Unit means this runs once when the composable enters the composition
+        loadStatus()
+    }
+
     // Effect to react to status changes for sound playback
     LaunchedEffect(statusResult) {
+
         if (statusResult is SilksongStatus.Success) {
             val successStatus = statusResult as SilksongStatus.Success
             if (successStatus.isOut) {
@@ -270,6 +275,7 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         Button(onClick = { loadStatus() }) { // Allow manual refresh
             Text("Refresh Status")
         }
+
     }
 }
 

@@ -76,7 +76,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 var counter=0
                 if(counter==0) {
                     counter=1
-                    return "COMING SOON"
+                    return "COMING SOON2"
                 }
                 else{
                     return "Coming2 soon"
