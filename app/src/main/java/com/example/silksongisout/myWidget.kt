@@ -16,11 +16,15 @@ import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 
+import android.media.MediaPlayer
+//import android.os.Bundle
+//import androidx.appcompat.app.AppCompatActivity
+
 // Constants for broadcasting to MainActivity (if you still want that functionality)
 // const val ACTION_UPDATE_SILKSONG_STATUS = "com.example.silksongisout.UPDATE_SILKSONG_STATUS"
 // const val EXTRA_SILKSONG_STATUS = "com.example.silksongisout.SILKSONG_STATUS"
 class MyWidgetProvider : AppWidgetProvider() {
-
+    private var mediaPlayer: MediaPlayer? = null
     // fetchSilksongData remains the same as your previous version or the app's version
     suspend fun fetchSilksongWidgetData(): String? { // Renamed to avoid confusion if you have both
         val client = OkHttpClient()
@@ -43,7 +47,7 @@ class MyWidgetProvider : AppWidgetProvider() {
      * Parses the JSON response to determine Silksong's release status for the widget.
      * Returns "YES" if out, "COMING SOON" if not, or an error message.
      */
-    fun parseSilksongStatusForWidget(jsonString: String?): String {
+    fun parseSilksongStatusForWidget(context: Context,jsonString: String?): String {
         if (jsonString == null) {
             return "ERROR" // Or "N/A", "Failed to load"
         }
@@ -74,6 +78,30 @@ class MyWidgetProvider : AppWidgetProvider() {
                 // Check if it has a price or any indication it's actually released
                 // For simplicity, if not "coming_soon", we'll assume "YES"
                 // You could add more checks here (e.g., presence of price_overview) if needed
+
+                // Ensure R.raw.alarm exists in your res/raw folder
+                mediaPlayer?.release() // Release any existing player
+                mediaPlayer = MediaPlayer.create(context, R.raw.alarm) // Use the passed context
+
+                mediaPlayer?.setOnPreparedListener {
+                    Log.d("MyWidgetProvider", "MediaPlayer prepared, starting playback.")
+                    it.start()
+                }
+
+                mediaPlayer?.setOnErrorListener { mp, what, extra ->
+                    Log.e("MyWidgetProvider", "MediaPlayer error: what $what, extra $extra")
+                    // Optionally release here too, or attempt to reset
+                    mp.release()
+                    mediaPlayer = null
+                    true // True if the error has been handled
+                }
+
+                mediaPlayer?.setOnCompletionListener {
+                    Log.d("MyWidgetProvider", "MediaPlayer playback completed.")
+                    it.release()
+                    mediaPlayer = null
+                }
+
                 return "YES"
             }
         } catch (e: JSONException) {
@@ -94,7 +122,7 @@ class MyWidgetProvider : AppWidgetProvider() {
             Log.d("MyWidgetProvider", "Coroutine launched")
             val json = fetchSilksongWidgetData()
             Log.d("MyWidgetProvider", "Fetched JSON: $json")
-            val textForWidget = parseSilksongStatusForWidget(json)
+            val textForWidget = parseSilksongStatusForWidget(context,json)
             Log.d("MyWidgetProvider", "Text for widget: $textForWidget")
 
             for (appWidgetId in appWidgetIds) {
