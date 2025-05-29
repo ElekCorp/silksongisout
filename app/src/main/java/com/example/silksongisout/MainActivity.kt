@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
 suspend fun fetchSilksongDataFromApi(): String? {
     val client = OkHttpClient()
     val request = Request.Builder()
-        .url("https://store.steampowered.com/api/appdetails?appids=2622380&cc=us&l=en") // Silksong App ID
+        .url("https://store.steampowered.com/api/appdetails?appids=1030300&cc=us&l=en") // Silksong App ID
         .build()
 
     return try {
@@ -121,7 +121,7 @@ fun parseSilksongReleaseStatus(jsonString: String?): SilksongStatus {
     return try {
         val root = JSONObject(jsonString)
         // The API nests the actual app data under its app ID
-        val appData = root.optJSONObject("2622380") // Use optJSONObject for safety
+        val appData = root.optJSONObject("1030300") // Use optJSONObject for safety
 
         if (appData == null || !appData.optBoolean("success", false)) {
             return SilksongStatus.Error("Invalid data received from API or app not found.")

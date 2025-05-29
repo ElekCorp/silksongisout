@@ -29,7 +29,7 @@ class MyWidgetProvider : AppWidgetProvider() {
     suspend fun fetchSilksongWidgetData(): String? { // Renamed to avoid confusion if you have both
         val client = OkHttpClient()
         val request = Request.Builder()
-            .url("https://store.steampowered.com/api/appdetails?appids=2622380&cc=us&l=en")
+            .url("https://store.steampowered.com/api/appdetails?appids=1030300&cc=us&l=en")
             .build()
         return try {
             withContext(Dispatchers.IO) {
@@ -53,7 +53,7 @@ class MyWidgetProvider : AppWidgetProvider() {
         }
         return try {
             val root = JSONObject(jsonString)
-            val appData = root.optJSONObject("2622380")
+            val appData = root.optJSONObject("1030300")
 
             if (appData == null || !appData.optBoolean("success", false)) {
                 return "API ERROR" // Or more descriptive
