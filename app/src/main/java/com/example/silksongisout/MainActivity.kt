@@ -1,6 +1,8 @@
 package com.example.silksongisout
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +40,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONException
 import org.json.JSONObject
+
 
 // Data class to represent the result
 sealed class SilksongStatus {
@@ -62,7 +67,7 @@ class MainActivity : ComponentActivity() {
 suspend fun fetchSilksongDataFromApi(): String? {
     val client = OkHttpClient()
     val request = Request.Builder()
-        .url("https://store.steampowered.com/api/appdetails?appids=1030300&cc=us&l=en") // Silksong App ID
+        .url("https://store.steampowered.com/api/appdetails?appids=2622380&cc=us&l=en") // Silksong App ID
         .build()
 
     return try {
@@ -83,6 +88,31 @@ suspend fun fetchSilksongDataFromApi(): String? {
     }
 }
 
+/*fun parseSilksongname(jsonString: String?): String? {
+    if (jsonString == null) {
+        //return "Failed to fetch data. Check network connection."
+    }
+    return try {
+        val root = JSONObject(jsonString)
+        // The API nests the actual app data under its app ID
+        val appData = root.optJSONObject("2622380") // Use optJSONObject for safety
+
+
+
+        val gameName = appData.optJSONObject("data")?.optString("name") // Access 'data' then 'name'
+
+        if (gameName.isNullOrEmpty()) { // Check if the extracted name is null or empty
+            return "Missing 'name' field in API response."
+        }
+
+        return gameName // Return the extracted string name
+
+    } catch (e: JSONException) {
+        e.printStackTrace()
+        return "Error parsing game name."
+    }
+}*/
+
 fun parseSilksongReleaseStatus(jsonString: String?): SilksongStatus {
     if (jsonString == null) {
         return SilksongStatus.Error("Failed to fetch data. Check network connection.")
@@ -90,7 +120,7 @@ fun parseSilksongReleaseStatus(jsonString: String?): SilksongStatus {
     return try {
         val root = JSONObject(jsonString)
         // The API nests the actual app data under its app ID
-        val appData = root.optJSONObject("1030300") // Use optJSONObject for safety
+        val appData = root.optJSONObject("2622380") // Use optJSONObject for safety
 
         if (appData == null || !appData.optBoolean("success", false)) {
             return SilksongStatus.Error("Invalid data received from API or app not found.")
@@ -124,6 +154,41 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
     var statusResult by remember { mutableStateOf<SilksongStatus>(SilksongStatus.Loading) }
     val coroutineScope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+
+    // Function to play sound
+    fun playAlarmSound() {
+        mediaPlayer?.release() // Release any existing player
+        // Ensure R.raw.alarm exists in your res/raw folder (e.g., res/raw/alarm.mp3)
+        mediaPlayer = MediaPlayer.create(context, R.raw.alarm)
+
+        mediaPlayer?.setOnPreparedListener {
+            Log.d("SilksongStatusScreen", "MediaPlayer prepared, starting alarm.mp3.")
+            it.start()
+        }
+        mediaPlayer?.setOnErrorListener { mp, what, extra ->
+            Log.e("SilksongStatusScreen", "MediaPlayer error: what $what, extra $extra")
+            mp.release()
+            mediaPlayer = null // Reset state
+            true // Error handled
+        }
+        mediaPlayer?.setOnCompletionListener {
+            Log.d("SilksongStatusScreen", "MediaPlayer playback (alarm.mp3) completed.")
+            it.release()
+            mediaPlayer = null // Reset state
+        }
+    }
+
+    // Function to stop and release sound
+    fun stopAndReleaseSound() {
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.stop()
+        }
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+
     fun loadStatus() {
         statusResult = SilksongStatus.Loading // Set to loading before each fetch
         coroutineScope.launch {
@@ -132,9 +197,29 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    // Fetch data when the screen is first composed
-    LaunchedEffect(Unit) { // Unit means this runs once when the composable enters the composition
-        loadStatus()
+    // Effect to react to status changes for sound playback
+    LaunchedEffect(statusResult) {
+        if (statusResult is SilksongStatus.Success) {
+            val successStatus = statusResult as SilksongStatus.Success
+            if (successStatus.isOut) {
+                // Only play if it's "YES"
+                playAlarmSound()
+            } else {
+                // If it's "NO" or any other state after being "YES", stop the sound
+                stopAndReleaseSound()
+            }
+        } else if (statusResult is SilksongStatus.Loading || statusResult is SilksongStatus.Error) {
+            // Stop sound if loading or error occurs (e.g., during a refresh)
+            stopAndReleaseSound()
+        }
+    }
+
+    // Cleanup MediaPlayer when the composable is disposed
+    DisposableEffect(Unit) {
+        onDispose {
+            Log.d("SilksongStatusScreen", "Disposing SilksongStatusScreen, releasing MediaPlayer.")
+            stopAndReleaseSound()
+        }
     }
 
     Column(
@@ -166,6 +251,7 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.ExtraBold,
                     color = if (currentStatus.isOut) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
                 )
+
             }
 
             is SilksongStatus.Error -> {
