@@ -41,7 +41,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONException
 import org.json.JSONObject
-
+import androidx.compose.foundation.layout.Box // Import Box
+import androidx.compose.foundation.layout.fillMaxWidth // To make the Box take full width
 
 // Data class to represent the result
 sealed class SilksongStatus {
@@ -237,6 +238,11 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    Box(
+        modifier = modifier
+            .fillMaxSize() // Make the Box fill the available space
+    ) {
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -244,6 +250,10 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+
+
+
         Text(
             text = "Is ${gameName} Out?",
             fontSize = 24.sp,
@@ -286,6 +296,23 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
             Text("Refresh Status")
         }
 
+
+
+    }
+
+    Button(
+        onClick = {
+            // Action for the new button
+            Log.d("SilksongStatusScreen", "New Button Clicked!")
+            // You can add any other logic here, like navigating to another screen,
+            // showing a dialog, or performing another action.
+        },
+        modifier =  Modifier
+            .align(Alignment.TopEnd) // Align this IconButton to the top-end of the Box
+            .padding(16.dp) // Add some padding so it's not flush against the edges
+    ) {
+        Text("Settings") // Text for the new button
+    }
     }
 }
 
