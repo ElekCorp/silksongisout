@@ -44,7 +44,7 @@ class MyWidgetProvider : AppWidgetProvider() {
      * Parses the JSON response to determine Silksong's release status for the widget.
      * Returns "YES" if out, "COMING SOON" if not, or an error message.
      */
-    var counter=0
+
     fun parseSilksongStatusForWidget(context: Context,jsonString: String?): String {
 
         if (jsonString == null) {
@@ -72,15 +72,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 releaseDateObject.optBoolean("coming_soon", true) // Default to true if missing
 
             if (comingSoon) {
-
-                if(counter==0) {
-                    counter=1
-                    return "COMING SOON2"
-                }
-                else{
-                    return "Coming2 soon"
-                }
-
+                return "COMING SOON"
             } else {
                 // Check if it has a price or any indication it's actually released
                 // For simplicity, if not "coming_soon", we'll assume "YES"
