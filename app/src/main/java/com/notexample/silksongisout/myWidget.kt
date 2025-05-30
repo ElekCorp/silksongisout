@@ -16,8 +16,6 @@ import org.json.JSONException
 import org.json.JSONObject
 
 import android.media.MediaPlayer
-//import android.os.Bundle
-//import androidx.appcompat.app.AppCompatActivity
 
 // Constants for broadcasting to MainActivity (if you still want that functionality)
 // const val ACTION_UPDATE_SILKSONG_STATUS = "com.example.silksongisout.UPDATE_SILKSONG_STATUS"
@@ -46,7 +44,9 @@ class MyWidgetProvider : AppWidgetProvider() {
      * Parses the JSON response to determine Silksong's release status for the widget.
      * Returns "YES" if out, "COMING SOON" if not, or an error message.
      */
+    var counter=0
     fun parseSilksongStatusForWidget(context: Context,jsonString: String?): String {
+
         if (jsonString == null) {
             return "ERROR" // Or "N/A", "Failed to load"
         }
@@ -72,7 +72,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 releaseDateObject.optBoolean("coming_soon", true) // Default to true if missing
 
             if (comingSoon) {
-                var counter=0
+
                 if(counter==0) {
                     counter=1
                     return "COMING SOON2"

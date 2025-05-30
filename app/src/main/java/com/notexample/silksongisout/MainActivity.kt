@@ -98,7 +98,7 @@ fun parseSilksongname(jsonString: String?): String? {
         // The API nests the actual app data under its app ID
         val appData = root.optJSONObject("1030300") // Use optJSONObject for safety
 
-        val data = appData.optJSONObject("data") // Access 'data' then 'name'
+        val data = appData?.optJSONObject("data") // Access 'data' then 'name'
         if (data == null) {
             return "Missing 'data' field in API response."
         }
