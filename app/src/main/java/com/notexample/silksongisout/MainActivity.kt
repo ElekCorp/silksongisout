@@ -89,18 +89,21 @@ suspend fun fetchSilksongDataFromApi(): String? {
     }
 }
 
-/*fun parseSilksongname(jsonString: String?): String? {
+fun parseSilksongname(jsonString: String?): String? {
     if (jsonString == null) {
-        //return "Failed to fetch data. Check network connection."
+        return "Failed to fetch data. Check network connection."
     }
     return try {
         val root = JSONObject(jsonString)
         // The API nests the actual app data under its app ID
-        val appData = root.optJSONObject("2622380") // Use optJSONObject for safety
+        val appData = root.optJSONObject("1030300") // Use optJSONObject for safety
 
+        val data = appData.optJSONObject("data") // Access 'data' then 'name'
+        if (data == null) {
+            return "Missing 'data' field in API response."
+        }
 
-
-        val gameName = appData.optJSONObject("data")?.optString("name") // Access 'data' then 'name'
+        val gameName = data.optString("name")
 
         if (gameName.isNullOrEmpty()) { // Check if the extracted name is null or empty
             return "Missing 'name' field in API response."
@@ -112,7 +115,7 @@ suspend fun fetchSilksongDataFromApi(): String? {
         e.printStackTrace()
         return "Error parsing game name."
     }
-}*/
+}
 
 fun parseSilksongReleaseStatus(jsonString: String?): SilksongStatus {
     if (jsonString == null) {
@@ -157,6 +160,7 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+    var gameName by remember { mutableStateOf<String?>("Silksong") } //parseSilksongname(fetchSilksongDataFromApi())
 
     // Function to play sound
     fun playAlarmSound() {
@@ -195,6 +199,7 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         coroutineScope.launch {
             val jsonData = fetchSilksongDataFromApi()
             statusResult = parseSilksongReleaseStatus(jsonData)
+            gameName = parseSilksongname(jsonData)
         }
     }
 
@@ -240,8 +245,8 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Is Silksong Out?",
-            fontSize = 28.sp,
+            text = "Is ${gameName} Out?",
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
