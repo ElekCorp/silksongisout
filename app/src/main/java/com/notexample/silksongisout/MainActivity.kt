@@ -64,12 +64,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
+var appid = "1030300" // Silksong App ID
 // --- Network and Parsing Logic (can be in a separate file or ViewModel later) ---
 suspend fun fetchSilksongDataFromApi(): String? {
+
     val client = OkHttpClient()
     val request = Request.Builder()
-        .url("https://store.steampowered.com/api/appdetails?appids=1030300&cc=us&l=en") // Silksong App ID
+        .url("https://store.steampowered.com/api/appdetails?appids=${appid}&cc=us&l=en") // Silksong App ID
         .build()
 
     return try {
@@ -97,7 +98,7 @@ fun parseSilksongname(jsonString: String?): String? {
     return try {
         val root = JSONObject(jsonString)
         // The API nests the actual app data under its app ID
-        val appData = root.optJSONObject("1030300") // Use optJSONObject for safety
+        val appData = root.optJSONObject(appid) // Use optJSONObject for safety
 
         val data = appData?.optJSONObject("data") // Access 'data' then 'name'
         if (data == null) {
@@ -125,7 +126,7 @@ fun parseSilksongReleaseStatus(jsonString: String?): SilksongStatus {
     return try {
         val root = JSONObject(jsonString)
         // The API nests the actual app data under its app ID
-        val appData = root.optJSONObject("1030300") // Use optJSONObject for safety
+        val appData = root.optJSONObject(appid) // Use optJSONObject for safety
 
         if (appData == null || !appData.optBoolean("success", false)) {
             return SilksongStatus.Error("Invalid data received from API or app not found.")
@@ -304,6 +305,8 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         onClick = {
             // Action for the new button
             Log.d("SilksongStatusScreen", "New Button Clicked!")
+            appid="427520"
+            loadStatus()
             // You can add any other logic here, like navigating to another screen,
             // showing a dialog, or performing another action.
         },
