@@ -305,7 +305,7 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         onClick = {
             // Action for the new button
             Log.d("SilksongStatusScreen", "New Button Clicked!")
-            appid="427520"
+            appid="3677050"//"427520"
             loadStatus()
             // You can add any other logic here, like navigating to another screen,
             // showing a dialog, or performing another action.
