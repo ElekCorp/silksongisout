@@ -209,7 +209,7 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         while (true) {
             Log.d("SilksongStatusScreen", "Periodic update: Loading status...")
             loadStatus() // Call the suspend function
-            delay(600000L) // Delay for 60000 milliseconds (1 minute)
+            delay(60000L) // Delay for 60000 milliseconds (1 minute)
         }
     }
 

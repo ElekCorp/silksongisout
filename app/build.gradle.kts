@@ -12,15 +12,20 @@ android {
         applicationId = "com.notexample.silksongisout"
         minSdk = 29
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.01"
+        versionCode = 5
+        versionName = "1.05"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            // Enables code-related app optimization.
+            //isMinifyEnabled = true//false
             isMinifyEnabled = false
+            // Enables resource shrinking.
+            //isShrinkResources = true
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

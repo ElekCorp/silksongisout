@@ -29,28 +29,35 @@ import java.util.Date
 
 class MyWidgetProvider : AppWidgetProvider() {
     private var mediaPlayer: MediaPlayer? = null
-    var counter=1
 
     companion object {
         const val ACTION_REFRESH = "com.example.widget.ACTION_REFRESH"
     }
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
+        val scope = CoroutineScope(Dispatchers.Main)
 
-        if (intent.action == ACTION_REFRESH) {
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val componentName = ComponentName(context, MyWidgetProvider::class.java)
-            val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
+        scope.launch {
+            Log.d("MyWidgetProvider", "Coroutine launched")
+            val json = fetchSilksongWidgetData()
+            Log.d("MyWidgetProvider", "Fetched JSON: $json")
+            val textForWidget = parseSilksongStatusForWidget(context,json)
+            Log.d("MyWidgetProvider", "Text for widget: $textForWidget")
+            //}
+            if (intent.action == ACTION_REFRESH) {
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val componentName = ComponentName(context, MyWidgetProvider::class.java)
+                val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
 
-            for (widgetId in widgetIds) {
-                val views = RemoteViews(context.packageName, R.layout.widget_layout)
-                views.setTextViewText(R.id.widget_text, "Refreshed: ${Date()}")
+                for (widgetId in widgetIds) {
+                    val views = RemoteViews(context.packageName, R.layout.widget_layout)
+                    views.setTextViewText(R.id.widget_text, "Refreshed: ${Date()} ${textForWidget}")
 
-                appWidgetManager.updateAppWidget(widgetId, views)
+                    appWidgetManager.updateAppWidget(widgetId, views)
+                }
             }
         }
     }
-
     // fetchSilksongData remains the same as your previous version or the app's version
     suspend fun fetchSilksongWidgetData(): String? { // Renamed to avoid confusion if you have both
         val client = OkHttpClient()
@@ -101,7 +108,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 releaseDateObject.optBoolean("coming_soon", true) // Default to true if missing
 
             if (comingSoon) {
-                return "COMING SOON3"
+                return "COMING SOON"
             } else {
                 // Check if it has a price or any indication it's actually released
                 // For simplicity, if not "coming_soon", we'll assume "YES"
@@ -150,8 +157,7 @@ class MyWidgetProvider : AppWidgetProvider() {
             Log.d("MyWidgetProvider", "Coroutine launched")
             val json = fetchSilksongWidgetData()
             Log.d("MyWidgetProvider", "Fetched JSON: $json")
-            val textForWidget = "COMING SOON$counter"//parseSilksongStatusForWidget(context,json)
-            counter += 1
+            val textForWidget = parseSilksongStatusForWidget(context,json)
             Log.d("MyWidgetProvider", "Text for widget: $textForWidget")
 
             for (appWidgetId in appWidgetIds) {
@@ -173,7 +179,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 views.setOnClickPendingIntent(R.id.widget_refresh_button, pendingIntent)
 
                 // Initial text
-                views.setTextViewText(R.id.widget_text, "Updated: ${Date()}")
+                views.setTextViewText(R.id.widget_text, "Updated: ${Date()} ${textForWidget}")
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
 
