@@ -17,11 +17,40 @@ import org.json.JSONObject
 
 import android.media.MediaPlayer
 
+import android.content.Intent
+import android.app.PendingIntent
+import android.content.ComponentName
+import java.util.Date
 // Constants for broadcasting to MainActivity (if you still want that functionality)
 // const val ACTION_UPDATE_SILKSONG_STATUS = "com.example.silksongisout.UPDATE_SILKSONG_STATUS"
 // const val EXTRA_SILKSONG_STATUS = "com.example.silksongisout.SILKSONG_STATUS"
+
+
+
 class MyWidgetProvider : AppWidgetProvider() {
     private var mediaPlayer: MediaPlayer? = null
+    var counter=1
+
+    companion object {
+        const val ACTION_REFRESH = "com.example.widget.ACTION_REFRESH"
+    }
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+
+        if (intent.action == ACTION_REFRESH) {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val componentName = ComponentName(context, MyWidgetProvider::class.java)
+            val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
+
+            for (widgetId in widgetIds) {
+                val views = RemoteViews(context.packageName, R.layout.widget_layout)
+                views.setTextViewText(R.id.widget_text, "Refreshed: ${Date()}")
+
+                appWidgetManager.updateAppWidget(widgetId, views)
+            }
+        }
+    }
+
     // fetchSilksongData remains the same as your previous version or the app's version
     suspend fun fetchSilksongWidgetData(): String? { // Renamed to avoid confusion if you have both
         val client = OkHttpClient()
@@ -72,7 +101,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 releaseDateObject.optBoolean("coming_soon", true) // Default to true if missing
 
             if (comingSoon) {
-                return "COMING SOON2"
+                return "COMING SOON3"
             } else {
                 // Check if it has a price or any indication it's actually released
                 // For simplicity, if not "coming_soon", we'll assume "YES"
@@ -121,7 +150,8 @@ class MyWidgetProvider : AppWidgetProvider() {
             Log.d("MyWidgetProvider", "Coroutine launched")
             val json = fetchSilksongWidgetData()
             Log.d("MyWidgetProvider", "Fetched JSON: $json")
-            val textForWidget = parseSilksongStatusForWidget(context,json)
+            val textForWidget = "COMING SOON$counter"//parseSilksongStatusForWidget(context,json)
+            counter += 1
             Log.d("MyWidgetProvider", "Text for widget: $textForWidget")
 
             for (appWidgetId in appWidgetIds) {
@@ -130,6 +160,23 @@ class MyWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.widget_text, textForWidget)
                 appWidgetManager.updateAppWidget(appWidgetId, views)
                 Log.d("MyWidgetProvider", "Widget ID $appWidgetId updated")
+
+
+                // Setup refresh button intent
+                val intent = Intent(context, MyWidgetProvider::class.java).apply {
+                    action = ACTION_REFRESH
+                }
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context, 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                views.setOnClickPendingIntent(R.id.widget_refresh_button, pendingIntent)
+
+                // Initial text
+                views.setTextViewText(R.id.widget_text, "Updated: ${Date()}")
+
+                appWidgetManager.updateAppWidget(appWidgetId, views)
+
             }
         }
     }
