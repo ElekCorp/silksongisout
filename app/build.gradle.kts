@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.notexample.silksongisout"
+    namespace = "com.not2example.silksongisout"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.notexample.silksongisout"
+        applicationId = "com.not2example.silksongisout"
         minSdk = 29
         targetSdk = 35
         versionCode = 1

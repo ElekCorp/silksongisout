@@ -1,4 +1,4 @@
-package com.notexample.silksongisout
+package com.not2example.silksongisout
 
 import android.media.MediaPlayer
 import android.os.Bundle
