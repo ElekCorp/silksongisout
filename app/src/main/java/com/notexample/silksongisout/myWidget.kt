@@ -33,9 +33,11 @@ class MyWidgetProvider : AppWidgetProvider() {
     companion object {
         const val ACTION_REFRESH = "com.example.widget.ACTION_REFRESH"
     }
+
+
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        val scope = CoroutineScope(Dispatchers.Main)
+        val scope = CoroutineScope(Dispatchers.IO)
 
         scope.launch {
             Log.d("MyWidgetProvider", "Coroutine launched")
@@ -67,11 +69,20 @@ class MyWidgetProvider : AppWidgetProvider() {
         return try {
             withContext(Dispatchers.IO) {
                 client.newCall(request).execute().use { response ->
-                    if (response.isSuccessful) response.body?.string() else null
+                    if (response.isSuccessful) {
+                        val bodyString = response.body?.string()
+                        Log.d("fetchSilksongData","Succes?:${response.isSuccessful} RESPONSE: ${bodyString}")
+                        bodyString
+                    } else {
+                        Log.d("fetchSilksongData","Succes?:${response.isSuccessful}")
+                        Log.w("fetchSilksongData", "Failed request: ${response.code}")
+                        null
+                    }
+                    }
                 }
-            }
+
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("fetchSilksongData", "Exception in fetchSilksongWidgetData", e)
             null
         }
     }
@@ -84,7 +95,7 @@ class MyWidgetProvider : AppWidgetProvider() {
     fun parseSilksongStatusForWidget(context: Context,jsonString: String?): String {
 
         if (jsonString == null) {
-            return "ERROR" // Or "N/A", "Failed to load"
+            return "ERROR by network issue" // Or "N/A", "Failed to load"
         }
         return try {
             val root = JSONObject(jsonString)
@@ -108,7 +119,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 releaseDateObject.optBoolean("coming_soon", true) // Default to true if missing
 
             if (comingSoon) {
-                return "COMING SOON"
+                return "COMING SOON2"
             } else {
                 // Check if it has a price or any indication it's actually released
                 // For simplicity, if not "coming_soon", we'll assume "YES"

@@ -12,7 +12,7 @@ android {
         applicationId = "com.not2example.silksongisout"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
+        versionCode = 4
         versionName = "1.05"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -31,6 +31,10 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
+
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
     compileOptions {

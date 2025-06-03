@@ -77,15 +77,19 @@ suspend fun fetchSilksongDataFromApi(): String? {
         withContext(Dispatchers.IO) {
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
-                    response.body?.string()
+                    val bodyString = response.body?.string()
+                    Log.d("fetchSilksongData","Succes?:${response.isSuccessful} RESPONSE: ${bodyString}")
+                    bodyString
                 } else {
                     // Log error or handle specific HTTP error codes
+                    Log.w("fetchSilksongData", "Failed request: ${response.code}")
                     null
                 }
             }
         }
     } catch (e: Exception) {
         // Log network exception
+        Log.e("fetchSilksongData", "Exception in fetchSilksongWidgetData", e)
         e.printStackTrace()
         null
     }
