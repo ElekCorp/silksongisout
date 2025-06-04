@@ -1,4 +1,4 @@
-package com.not2example.silksongisout
+package com.notexample.silksongisout
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider

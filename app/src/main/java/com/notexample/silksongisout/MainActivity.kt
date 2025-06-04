@@ -1,4 +1,4 @@
-package com.not2example.silksongisout
+package com.notexample.silksongisout
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -42,7 +42,7 @@ import okhttp3.Request
 import org.json.JSONException
 import org.json.JSONObject
 import androidx.compose.foundation.layout.Box // Import Box
-import androidx.compose.foundation.layout.fillMaxWidth // To make the Box take full width
+//import androidx.compose.foundation.layout.fillMaxWidth // To make the Box take full width
 
 // Data class to represent the result
 sealed class SilksongStatus {
@@ -115,11 +115,11 @@ fun parseSilksongname(jsonString: String?): String? {
             return "Missing 'name' field in API response."
         }
 
-        return gameName // Return the extracted string name
+        gameName // Return the extracted string name
 
     } catch (e: JSONException) {
         e.printStackTrace()
-        return "Error parsing game name."
+        "Error parsing game name."
     }
 }
 
@@ -294,6 +294,10 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(currentStatus.message, fontSize = 16.sp)
             }
+
+            else -> {
+                Log.d("SilksongStatusScreen", "Unknown status: $currentStatus")
+            }
         }
 
         Spacer(modifier = Modifier.height(48.dp))
@@ -338,7 +342,7 @@ fun SilksongStatusScreenPreviewLoading() {
 fun SilksongStatusScreenPreviewYes() {
     SilksongisoutTheme {
         // Manually create the state for previewing specific scenarios
-        val statusResult = SilksongStatus.Success(isOut = true)
+        //val statusResult = SilksongStatus.Success(isOut = true)
         // This is a simplified version of the screen for previewing:
         Column(
             modifier = Modifier
@@ -365,7 +369,7 @@ fun SilksongStatusScreenPreviewYes() {
 @Composable
 fun SilksongStatusScreenPreviewNo() {
     SilksongisoutTheme {
-        val statusResult = SilksongStatus.Success(isOut = false)
+        //val statusResult = SilksongStatus.Success(isOut = false)
         Column(
             modifier = Modifier
                 .fillMaxSize()

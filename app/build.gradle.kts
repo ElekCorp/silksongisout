@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.not2example.silksongisout"
+    namespace = "com.notexample.silksongisout"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.not2example.silksongisout"
+        applicationId = "com.notexample.silksongisout"
         minSdk = 29
         targetSdk = 35
         versionCode = 7
@@ -66,8 +66,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("androidx.work:work-runtime:2.9.0")
+    implementation(libs.okhttp)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.work.runtime)
     //implementation("com.google.android.material:material:1.9.0")
 }
