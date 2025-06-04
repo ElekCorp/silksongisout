@@ -12,8 +12,8 @@ android {
         applicationId = "com.not2example.silksongisout"
         minSdk = 29
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.05"
+        versionCode = 7
+        versionName = "1.06"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,7 +33,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
 
             ndk {
-                debugSymbolLevel = "FULL"
+                debugSymbolLevel = "SYMBOL_TABLE"
             }
         }
     }
