@@ -44,6 +44,16 @@ import org.json.JSONObject
 import androidx.compose.foundation.layout.Box // Import Box
 //import androidx.compose.foundation.layout.fillMaxWidth // To make the Box take full width
 
+
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.rememberTextMeasurer
+
+
 // Data class to represent the result
 sealed class SilksongStatus {
     object Loading : SilksongStatus()
@@ -158,6 +168,47 @@ fun parseSilksongReleaseStatus(jsonString: String?): SilksongStatus {
     }
 }
 
+@Composable
+fun ScaledText(
+    text: String,
+    maxFontSize: TextUnit = 40.sp,
+    minFontSize: TextUnit = 10.sp,
+    modifier: Modifier = Modifier,
+    fontWeight: FontWeight = FontWeight.Bold,
+    color: Color = MaterialTheme.colorScheme.primary
+) {
+    BoxWithConstraints(modifier = modifier) {
+        val measurer = rememberTextMeasurer()
+        var bestFontSize by remember { mutableStateOf(maxFontSize) }
+
+        val constraintsWidth = constraints.maxWidth.toFloat()
+
+        LaunchedEffect(text, maxFontSize, minFontSize, constraintsWidth) {
+            var testSize = maxFontSize
+            while (testSize > minFontSize) {
+                val result = measurer.measure(
+                    text = AnnotatedString(text),
+                    style = TextStyle(fontSize = testSize, fontWeight = fontWeight)
+                )
+                if (result.size.width <= constraintsWidth) {
+                    break
+                }
+                testSize *= 0.95f // Fokozatosan csökkenti a méretet
+            }
+            bestFontSize = testSize
+        }
+
+        Text(
+            text = text,
+            fontSize = bestFontSize*0.95,
+            fontWeight = fontWeight,
+            color = color,
+            maxLines = 1,
+            overflow = TextOverflow.Clip
+        )
+    }
+}
+
 // --- End of Network and Parsing Logic ---
 @Composable
 fun SilksongStatusScreen(modifier: Modifier = Modifier) {
@@ -256,26 +307,14 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
 
+        ScaledText(text = "Is $gameName Out")
+        /* Text(
+             text = "Is $gameName Out",
+             fontSize = 23.sp,
+             fontWeight = FontWeight.Bold,
+             color = MaterialTheme.colorScheme.primary
+         )*/
 
-        /*Text(
-            text = "Is",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )*/
-
-        Text(
-            text = "Is ${gameName} Out",
-            fontSize = 23.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        /*Text(
-            text = "Out?",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )*/
         Spacer(modifier = Modifier.height(32.dp))
 
         when (val currentStatus = statusResult) {
@@ -306,9 +345,9 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
                 Text(currentStatus.message, fontSize = 16.sp)
             }
 
-            else -> {
+            /*else -> {
                 Log.d("SilksongStatusScreen", "Unknown status: $currentStatus")
-            }
+            }*/
         }
 
         Spacer(modifier = Modifier.height(48.dp))
