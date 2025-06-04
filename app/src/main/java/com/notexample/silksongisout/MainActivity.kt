@@ -257,14 +257,25 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
     ) {
 
 
-
+        /*Text(
+            text = "Is",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )*/
 
         Text(
-            text = "Is ${gameName} Out?",
-            fontSize = 24.sp,
+            text = "Is ${gameName} Out",
+            fontSize = 23.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
+        /*Text(
+            text = "Out?",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )*/
         Spacer(modifier = Modifier.height(32.dp))
 
         when (val currentStatus = statusResult) {
