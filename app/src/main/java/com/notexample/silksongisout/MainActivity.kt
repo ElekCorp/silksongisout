@@ -306,9 +306,9 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
                 Text(currentStatus.message, fontSize = 16.sp)
             }
 
-            else -> {
+            /*else -> {
                 Log.d("SilksongStatusScreen", "Unknown status: $currentStatus")
-            }
+            }*/
         }
 
         Spacer(modifier = Modifier.height(48.dp))
