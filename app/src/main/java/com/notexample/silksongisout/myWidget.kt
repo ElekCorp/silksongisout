@@ -119,7 +119,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 releaseDateObject.optBoolean("coming_soon", true) // Default to true if missing
 
             if (comingSoon) {
-                return "COMING SOON2"
+                return "COMING SOON"
             } else {
                 // Check if it has a price or any indication it's actually released
                 // For simplicity, if not "coming_soon", we'll assume "YES"
