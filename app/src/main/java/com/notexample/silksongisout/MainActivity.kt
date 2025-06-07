@@ -61,6 +61,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import kotlin.text.filter
 import kotlin.text.isDigit
 import android.widget.Toast
+import androidx.core.content.edit
 
 // --- SharedPreferences for appid ---
 private const val PREFS_APP_SETTINGS = "AppSettingsPrefs"
@@ -69,7 +70,7 @@ const val DEFAULT_APP_ID = "1030300" // Default Silksong App ID
 
 fun saveAppId(context: Context, appId: String) {
     val prefs: SharedPreferences = context.getSharedPreferences(PREFS_APP_SETTINGS, Context.MODE_PRIVATE)
-    prefs.edit().putString(PREF_KEY_APP_ID, appId).apply()
+    prefs.edit { putString(PREF_KEY_APP_ID, appId) }
 }
 
 fun getSavedAppId(context: Context): String {
