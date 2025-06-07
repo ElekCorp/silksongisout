@@ -20,7 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+//import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,7 +80,7 @@ fun getSavedAppId(context: Context): String {
 
 // Data class to represent the result
 sealed class SilksongStatus {
-    object Loading : SilksongStatus()
+    data object Loading : SilksongStatus()
     data class Success(val isOut: Boolean) : SilksongStatus()
     data class Error(val message: String) : SilksongStatus()
 }
@@ -101,10 +101,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ScaledText(
+    modifier: Modifier = Modifier,
     text: String,
     maxFontSize: TextUnit = 40.sp,
     minFontSize: TextUnit = 10.sp,
-    modifier: Modifier = Modifier,
     fontWeight: FontWeight = FontWeight.Bold,
     color: Color = MaterialTheme.colorScheme.primary
 ) {
@@ -376,7 +376,7 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
                         val bodyString = response.body?.string()
                         Log.d(
                             "fetchSilksongData",
-                            "AppID: $appIdToFetch, Success?:${response.isSuccessful} RESPONSE: ${bodyString}"
+                            "AppID: $appIdToFetch, Success?:${response.isSuccessful} RESPONSE: $bodyString"
                         )
                         bodyString
                     } else {
@@ -405,8 +405,7 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         return try {
             val root = JSONObject(jsonString)
             val appData = root.optJSONObject(appIdToParse)
-            val data = appData?.optJSONObject("data")
-            if (data == null) return "Missing 'data' in API response."
+            val data = appData?.optJSONObject("data") ?: return "Missing 'data' in API response."
             val name = data.optString("name")
             if (name.isNullOrEmpty()) "Unknown Game" else name
         } catch (e: JSONException) {
@@ -429,9 +428,9 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
                 return SilksongStatus.Error("Invalid AppID or API error.")
             }
             val data = appData.optJSONObject("data")
-            if (data == null) return SilksongStatus.Error("Missing 'data' in API response.")
+                ?: return SilksongStatus.Error("Missing 'data' in API response.")
             val releaseDateObject = data.optJSONObject("release_date")
-            if (releaseDateObject == null) return SilksongStatus.Error("Missing 'release_date'.")
+                ?: return SilksongStatus.Error("Missing 'release_date'.")
             val comingSoon = releaseDateObject.optBoolean("coming_soon", true)
             SilksongStatus.Success(isOut = !comingSoon)
         } catch (e: JSONException) {
@@ -464,9 +463,9 @@ fun SilksongStatusScreen(modifier: Modifier = Modifier) {
         loadStatus(currentAppId) // Initial load with the current app ID
 
         // Optional: If you want periodic refresh for the current app ID
-        val periodicJob = launch {
+        launch {
             while (true) {
-                delay(60000L) // Delay for 1 minute
+                delay(6000L) // Delay for 1 minute
                 Log.d("SilksongStatusScreen", "Periodic update for AppID: $currentAppId")
                 loadStatus(currentAppId)
             }
