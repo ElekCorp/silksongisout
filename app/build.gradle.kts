@@ -12,8 +12,8 @@ android {
         applicationId = "com.not2example.silksongisout"
         minSdk = 29
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.06"
+        versionCode = 9
+        versionName = "1.09"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

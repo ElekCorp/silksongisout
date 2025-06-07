@@ -53,7 +53,7 @@ class MyWidgetProvider : AppWidgetProvider() {
 
                 for (widgetId in widgetIds) {
                     val views = RemoteViews(context.packageName, R.layout.widget_layout)
-                    views.setTextViewText(R.id.widget_text, "Refreshed: ${Date()} ${textForWidget}")
+                    views.setTextViewText(R.id.widget_text, "Refreshed: ${Date()} $textForWidget")
 
                     appWidgetManager.updateAppWidget(widgetId, views)
                 }
@@ -61,7 +61,7 @@ class MyWidgetProvider : AppWidgetProvider() {
         }
     }
     // fetchSilksongData remains the same as your previous version or the app's version
-    suspend fun fetchSilksongWidgetData(): String? { // Renamed to avoid confusion if you have both
+    private suspend fun fetchSilksongWidgetData(): String? { // Renamed to avoid confusion if you have both
         val client = OkHttpClient()
         val request = Request.Builder()
             .url("https://store.steampowered.com/api/appdetails?appids=1030300&cc=us&l=en")
@@ -71,7 +71,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 client.newCall(request).execute().use { response ->
                     if (response.isSuccessful) {
                         val bodyString = response.body?.string()
-                        Log.d("fetchSilksongData","Succes?:${response.isSuccessful} RESPONSE: ${bodyString}")
+                        Log.d("fetchSilksongData","Succes?:${response.isSuccessful} RESPONSE: $bodyString")
                         bodyString
                     } else {
                         Log.d("fetchSilksongData","Succes?:${response.isSuccessful}")
@@ -92,7 +92,7 @@ class MyWidgetProvider : AppWidgetProvider() {
      * Returns "YES" if out, "COMING SOON" if not, or an error message.
      */
 
-    fun parseSilksongStatusForWidget(context: Context,jsonString: String?): String {
+    private fun parseSilksongStatusForWidget(context: Context,jsonString: String?): String {
 
         if (jsonString == null) {
             return "ERROR by network issue" // Or "N/A", "Failed to load"
@@ -106,14 +106,10 @@ class MyWidgetProvider : AppWidgetProvider() {
             }
 
             val data = appData.optJSONObject("data")
-            if (data == null) {
-                return "DATA ERR" // Or more descriptive
-            }
+                ?: return "DATA ERR" // Or more descriptive
 
             val releaseDateObject = data.optJSONObject("release_date")
-            if (releaseDateObject == null) {
-                return "DATE ERR" // Or more descriptive
-            }
+                ?: return "DATE ERR" // Or more descriptive
 
             val comingSoon =
                 releaseDateObject.optBoolean("coming_soon", true) // Default to true if missing
@@ -190,7 +186,7 @@ class MyWidgetProvider : AppWidgetProvider() {
                 views.setOnClickPendingIntent(R.id.widget_refresh_button, pendingIntent)
 
                 // Initial text
-                views.setTextViewText(R.id.widget_text, "Updated: ${Date()} ${textForWidget}")
+                views.setTextViewText(R.id.widget_text, "Updated: ${Date()} $textForWidget")
 
                 appWidgetManager.updateAppWidget(appWidgetId, views)
 
